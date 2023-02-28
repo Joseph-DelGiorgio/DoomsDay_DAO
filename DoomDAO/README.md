@@ -8,4 +8,4 @@ The second function, setMintingPrice(), allows the owner of the contract to set 
 
 The third function, setDaoWallet(), allows the owner to set a new DAO wallet address that will receive the payments sent by users when minting NFTs. The withdraw() function allows the owner to withdraw the balance of the contract to the DAO wallet.
 
-Some possible improvements could include adding more functionality to the DAO, such as allowing users to vote on important decisions, adding more key roles to the enum, and adding more security features to prevent malicious attacks.
+Some possible improvements could include adding more functionality to the DAO, adding more key roles to the enum, and adding more security features to prevent malicious attacks.
