@@ -78,9 +78,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 contract DoomsdayDAO is ERC721, Ownable {
     using Counters for Counters.Counter;
+    event URI(string uri, uint256 indexed tokenId);
+
 
     // Define the key roles
     enum KeyRole {
@@ -99,6 +102,7 @@ contract DoomsdayDAO is ERC721, Ownable {
         uint256 id;
         address owner;
         KeyRole keyRole;
+        string imageURI;
     }
 
     // Mapping to store NFTs
@@ -123,11 +127,31 @@ contract DoomsdayDAO is ERC721, Ownable {
         require(msg.value >= mintingPrice, "Insufficient payment");
         uint256 tokenId = totalSupply + 1;
         _safeMint(to, tokenId);
-        nfts[tokenId] = NFT(tokenId, to, keyRole);
+        nfts[tokenId] = NFT(tokenId, to, keyRole, "");
         totalSupply += 1;
         emit NFTMinted(to, tokenId, keyRole);
         daoWallet.transfer(msg.value);
+        _setTokenURI(tokenId, "");
     }
+
+    function mintNFTWithImage(address to, KeyRole keyRole, string memory imageURI) external payable {
+        require(totalSupply < MAX_NFTS, "Maximum NFT limit reached");
+        require(msg.value >= mintingPrice, "Insufficient payment");
+        uint256 tokenId = totalSupply + 1;
+        _safeMint(to, tokenId);
+        nfts[tokenId] = NFT(tokenId, to, keyRole, imageURI);
+        totalSupply += 1;
+        emit NFTMinted(to, tokenId, keyRole);
+        daoWallet.transfer(msg.value);
+        _setTokenURI(tokenId, imageURI);
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory uri) internal virtual {
+        require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        nfts[tokenId].imageURI = uri;
+        emit URI(uri, tokenId);
+    }
+
 
     function setMintingPrice(uint256 price) external onlyOwner {
         require(price >= MIN_MINTING_PRICE && price <= MAX_MINTING_PRICE, "Invalid price");
@@ -156,13 +180,13 @@ contract DoomsdayDAO is ERC721, Ownable {
     uint256 public proposalCount;
 
     function createProposal(string memory description) external {
-    proposalCount += 1;
-    Proposal storage newProposal = proposals[proposalCount];
-    newProposal.id = proposalCount;
-    newProposal.description = description;
-    newProposal.forVotes = 0;
-    newProposal.againstVotes = 0;
-    newProposal.executed = false;
+        proposalCount += 1;
+        Proposal storage newProposal = proposals[proposalCount];
+        newProposal.id = proposalCount;
+        newProposal.description = description;
+        newProposal.forVotes = 0;
+        newProposal.againstVotes = 0;
+        newProposal.executed = false;
     }
 
 
