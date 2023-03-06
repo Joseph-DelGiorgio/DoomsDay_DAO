@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract DoomsdayDAO is ERC721, Ownable {
     using Counters for Counters.Counter;
 
-    // Define the key roles
+    // Define the key role
     enum KeyRole {
         EmergencyServices,
         SearchAndRescue,
